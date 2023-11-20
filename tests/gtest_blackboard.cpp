@@ -108,6 +108,25 @@ TEST(BlackboardTest, BasicRemapping)
   ASSERT_EQ(bb->get<int>("my_output_port"), 22);
 }
 
+TEST(BlackboardTest, NullOutputRemapping)
+{
+  auto bb = Blackboard::create();
+
+  NodeConfig config;
+
+  config.blackboard = bb;
+  config.input_ports["in_port"] = "{my_input_port}";
+  config.output_ports["out_port"] = "";
+  bb->set("my_input_port", 11);
+
+  BB_TestNode node("good_one", config);
+  node.executeTick();
+
+  auto bb_keys = bb->getKeys();
+  auto it = std::find(bb_keys.begin(), bb_keys.end(), "");
+  ASSERT_EQ(it, bb_keys.end());
+}
+
 TEST(BlackboardTest, GetInputsFromText)
 {
   auto bb = Blackboard::create();
